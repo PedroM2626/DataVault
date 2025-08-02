@@ -41,47 +41,62 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
           {/* Navigation Actions */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-              onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.csv,.json,.sqlite,.db';
-                input.click();
-              }}
-            >
-              <Upload className="h-4 w-4" />
-              Upload
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-            >
-              <LayoutGrid className="h-4 w-4" />
-              Styles
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-            >
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-            >
-              <Share2 className="h-4 w-4" />
-              Share
-            </Button>
+            {!isSharedPage && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:flex"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.csv,.json,.sqlite,.db';
+                    input.click();
+                  }}
+                >
+                  <Upload className="h-4 w-4" />
+                  Upload
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:flex"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  Styles
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:flex"
+                >
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:flex"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </Button>
+              </>
+            )}
+
+            {isSharedPage && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.location.href = '/'}
+              >
+                <Database className="h-4 w-4" />
+                Create Your Own
+              </Button>
+            )}
 
             {/* Theme Toggle */}
             <Button
