@@ -30,6 +30,7 @@ export function createServer() {
   app.post("/api/update-row", handleUpdateRow);
   app.post("/api/export", handleExport);
   app.post("/api/share-design", handleShareDesign);
+  app.get("/api/shared/:shareId", handleGetSharedDesign);
 
   return app;
 }
