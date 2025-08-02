@@ -20,6 +20,8 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { theme, setTheme } = useTheme();
+  const location = useLocation();
+  const isSharedPage = location.pathname.startsWith('/shared/');
 
   return (
     <div className="min-h-screen bg-background">
