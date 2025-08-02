@@ -11,7 +11,11 @@ interface FileUploaderProps {
   hasData: boolean;
 }
 
-export default function FileUploader({ onFileUpload, isLoading, hasData }: FileUploaderProps) {
+export default function FileUploader({
+  onFileUpload,
+  isLoading,
+  hasData,
+}: FileUploaderProps) {
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,16 +49,17 @@ export default function FileUploader({ onFileUpload, isLoading, hasData }: FileU
   };
 
   const handleFileUpload = async (file: File) => {
-    const allowedTypes = ['.csv', '.json', '.sqlite', '.db'];
-    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-    
+    const allowedTypes = [".csv", ".json", ".sqlite", ".db"];
+    const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
+
     if (!allowedTypes.includes(fileExtension)) {
-      toast.error('Please upload a CSV, JSON, or SQLite file');
+      toast.error("Please upload a CSV, JSON, or SQLite file");
       return;
     }
 
-    if (file.size > 50 * 1024 * 1024) { // 50MB limit
-      toast.error('File size must be less than 50MB');
+    if (file.size > 50 * 1024 * 1024) {
+      // 50MB limit
+      toast.error("File size must be less than 50MB");
       return;
     }
 
@@ -67,12 +72,12 @@ export default function FileUploader({ onFileUpload, isLoading, hasData }: FileU
 
   const getFileIcon = (extension: string) => {
     switch (extension) {
-      case 'csv':
+      case "csv":
         return <FileText className="h-6 w-6" />;
-      case 'json':
+      case "json":
         return <FileJson className="h-6 w-6" />;
-      case 'sqlite':
-      case 'db':
+      case "sqlite":
+      case "db":
         return <Database className="h-6 w-6" />;
       default:
         return <FileText className="h-6 w-6" />;
@@ -80,11 +85,13 @@ export default function FileUploader({ onFileUpload, isLoading, hasData }: FileU
   };
 
   return (
-    <Card className={cn(
-      "transition-all duration-200",
-      hasData ? "border-dashed" : "border-2 border-dashed",
-      dragActive && "border-primary bg-primary/5"
-    )}>
+    <Card
+      className={cn(
+        "transition-all duration-200",
+        hasData ? "border-dashed" : "border-2 border-dashed",
+        dragActive && "border-primary bg-primary/5",
+      )}
+    >
       <CardContent className="p-6">
         <div
           className="relative"
@@ -110,7 +117,9 @@ export default function FileUploader({ onFileUpload, isLoading, hasData }: FileU
                 </div>
                 <div>
                   <p className="font-medium">Data loaded successfully</p>
-                  <p className="text-sm text-muted-foreground">Upload a new file to replace current data</p>
+                  <p className="text-sm text-muted-foreground">
+                    Upload a new file to replace current data
+                  </p>
                 </div>
               </div>
               <Button
@@ -136,16 +145,15 @@ export default function FileUploader({ onFileUpload, isLoading, hasData }: FileU
                   <Upload className="h-8 w-8 text-primary" />
                 )}
               </div>
-              
+
               <h3 className="text-lg font-semibold mb-2">
                 {isLoading ? "Processing file..." : "Upload your database"}
               </h3>
-              
+
               <p className="text-muted-foreground mb-6">
-                {isLoading 
+                {isLoading
                   ? "Please wait while we process your file"
-                  : "Drag and drop your file here, or click to browse"
-                }
+                  : "Drag and drop your file here, or click to browse"}
               </p>
 
               {!isLoading && (
@@ -157,15 +165,15 @@ export default function FileUploader({ onFileUpload, isLoading, hasData }: FileU
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {getFileIcon('csv')}
+                      {getFileIcon("csv")}
                       <span>CSV Files</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {getFileIcon('json')}
+                      {getFileIcon("json")}
                       <span>JSON Files</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {getFileIcon('sqlite')}
+                      {getFileIcon("sqlite")}
                       <span>SQLite Files</span>
                     </div>
                   </div>

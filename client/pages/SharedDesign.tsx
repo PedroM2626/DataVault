@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { 
-  Download, 
-  Share2, 
+import {
+  Download,
+  Share2,
   Table,
-  Grid3X3, 
+  Grid3X3,
   BarChart3,
   ExternalLink,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import DataVisualization from "@/components/DataVisualization";
 import type { ViewMode } from "@/pages/Index";
@@ -33,7 +39,7 @@ export default function SharedDesign() {
   const fetchSharedDesign = async (id: string) => {
     try {
       const response = await fetch(`/api/shared/${id}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error("Shared design not found");
@@ -46,10 +52,12 @@ export default function SharedDesign() {
       setColumns(result.columns || []);
       setViewMode(result.viewMode || "table");
       setDesignInfo(result);
-      
+
       toast.success("Shared design loaded successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to load shared design");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to load shared design",
+      );
       console.error("Fetch shared design error:", error);
     } finally {
       setIsLoading(false);
@@ -75,7 +83,7 @@ export default function SharedDesign() {
       a.download = `shared-data.${format}`;
       a.click();
       URL.revokeObjectURL(url);
-      
+
       toast.success(`Data exported as ${format.toUpperCase()}`);
     } catch (error) {
       toast.error("Failed to export data");
@@ -97,8 +105,12 @@ export default function SharedDesign() {
       <div className="container py-8">
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Loading shared design...</h2>
-          <p className="text-muted-foreground">Please wait while we fetch the data.</p>
+          <h2 className="text-xl font-semibold mb-2">
+            Loading shared design...
+          </h2>
+          <p className="text-muted-foreground">
+            Please wait while we fetch the data.
+          </p>
         </div>
       </div>
     );
@@ -113,7 +125,8 @@ export default function SharedDesign() {
           </div>
           <h1 className="text-2xl font-bold mb-2">Design Not Found</h1>
           <p className="text-muted-foreground mb-6">
-            The shared design you're looking for doesn't exist or has been removed.
+            The shared design you're looking for doesn't exist or has been
+            removed.
           </p>
           <Button asChild>
             <a href="/">Go to DataVault</a>
@@ -130,12 +143,14 @@ export default function SharedDesign() {
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="secondary">Shared Design</Badge>
           <span className="text-sm text-muted-foreground">
-            {designInfo?.createdAt && new Date(designInfo.createdAt).toLocaleDateString()}
+            {designInfo?.createdAt &&
+              new Date(designInfo.createdAt).toLocaleDateString()}
           </span>
         </div>
         <h1 className="text-3xl font-bold mb-2">Shared Database View</h1>
         <p className="text-muted-foreground">
-          This is a shared view of a database with {data.length} rows and {columns.length} columns.
+          This is a shared view of a database with {data.length} rows and{" "}
+          {columns.length} columns.
         </p>
       </div>
 
@@ -145,7 +160,7 @@ export default function SharedDesign() {
           <Badge variant="outline" className="text-sm">
             {data.length} rows • {columns.length} columns
           </Badge>
-          
+
           {/* View Mode Selector */}
           <div className="flex bg-muted rounded-lg p-1">
             <Button
@@ -196,11 +211,7 @@ export default function SharedDesign() {
             <Download className="h-4 w-4" />
             JSON
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleShare}
-          >
+          <Button variant="outline" size="sm" onClick={handleShare}>
             <Share2 className="h-4 w-4" />
             Copy Link
           </Button>
@@ -208,7 +219,7 @@ export default function SharedDesign() {
       </div>
 
       {/* Data Visualization */}
-      <DataVisualization 
+      <DataVisualization
         data={data}
         columns={columns}
         viewMode={viewMode}
@@ -223,8 +234,8 @@ export default function SharedDesign() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div>
-              Shared from <strong>DataVault</strong> • 
-              Viewed {designInfo?.accessCount || 0} times
+              Shared from <strong>DataVault</strong> • Viewed{" "}
+              {designInfo?.accessCount || 0} times
             </div>
             <div>
               <a href="/" className="text-primary hover:underline">

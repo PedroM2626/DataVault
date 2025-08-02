@@ -1,17 +1,23 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { 
-  Upload, 
-  Database, 
-  FileText, 
-  Grid3X3, 
+import {
+  Upload,
+  Database,
+  FileText,
+  Grid3X3,
   BarChart3,
   Table,
   Download,
-  Share2
+  Share2,
 } from "lucide-react";
 import FileUploader from "@/components/FileUploader";
 import DataVisualization from "@/components/DataVisualization";
@@ -30,7 +36,7 @@ export default function Index() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      
+
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -71,7 +77,7 @@ export default function Index() {
       a.download = `data.${format}`;
       a.click();
       URL.revokeObjectURL(url);
-      
+
       toast.success(`Data exported as ${format.toUpperCase()}`);
     } catch (error) {
       toast.error("Failed to export data");
@@ -84,11 +90,11 @@ export default function Index() {
       const response = await fetch("/api/share-design", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          data, 
-          columns, 
+        body: JSON.stringify({
+          data,
+          columns,
           viewMode,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         }),
       });
 
@@ -97,7 +103,7 @@ export default function Index() {
       }
 
       const result = await response.json();
-      
+
       // Copy to clipboard
       await navigator.clipboard.writeText(result.shareUrl);
       toast.success("Share link copied to clipboard!");
@@ -119,10 +125,11 @@ export default function Index() {
             Welcome to DataVault
           </h1>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Upload your database files and visualize them in multiple formats. 
-            Edit data inline, export modifications, and share your designs with others.
+            Upload your database files and visualize them in multiple formats.
+            Edit data inline, export modifications, and share your designs with
+            others.
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
             <Card className="text-center">
               <CardHeader>
@@ -135,7 +142,7 @@ export default function Index() {
                 </CardDescription>
               </CardContent>
             </Card>
-            
+
             <Card className="text-center">
               <CardHeader>
                 <Grid3X3 className="h-8 w-8 mx-auto text-primary mb-2" />
@@ -147,16 +154,14 @@ export default function Index() {
                 </CardDescription>
               </CardContent>
             </Card>
-            
+
             <Card className="text-center">
               <CardHeader>
                 <Share2 className="h-8 w-8 mx-auto text-primary mb-2" />
                 <CardTitle className="text-sm">Share & Export</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Export data and share designs
-                </CardDescription>
+                <CardDescription>Export data and share designs</CardDescription>
               </CardContent>
             </Card>
           </div>
@@ -164,8 +169,8 @@ export default function Index() {
       )}
 
       {/* File Upload */}
-      <FileUploader 
-        onFileUpload={handleFileUpload} 
+      <FileUploader
+        onFileUpload={handleFileUpload}
         isLoading={isLoading}
         hasData={data.length > 0}
       />
@@ -177,7 +182,7 @@ export default function Index() {
             <Badge variant="secondary" className="text-sm">
               {data.length} rows • {columns.length} columns
             </Badge>
-            
+
             {/* View Mode Selector */}
             <div className="flex bg-muted rounded-lg p-1">
               <Button
@@ -228,11 +233,7 @@ export default function Index() {
               <Download className="h-4 w-4" />
               JSON
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-            >
+            <Button variant="outline" size="sm" onClick={handleShare}>
               <Share2 className="h-4 w-4" />
               Share
             </Button>
@@ -242,7 +243,7 @@ export default function Index() {
 
       {/* Data Visualization */}
       {data.length > 0 && (
-        <DataVisualization 
+        <DataVisualization
           data={data}
           columns={columns}
           viewMode={viewMode}

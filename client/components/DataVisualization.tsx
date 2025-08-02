@@ -1,12 +1,36 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Edit2, Check, X } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import { cn } from "@/lib/utils";
 import type { ViewMode } from "@/pages/Index";
 
@@ -23,17 +47,28 @@ interface EditingCell {
   value: string;
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff00', '#ff00ff'];
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7300",
+  "#00ff00",
+  "#ff00ff",
+];
 
-export default function DataVisualization({ 
-  data, 
-  columns, 
-  viewMode, 
-  onDataUpdate 
+export default function DataVisualization({
+  data,
+  columns,
+  viewMode,
+  onDataUpdate,
 }: DataVisualizationProps) {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
 
-  const handleCellEdit = async (rowIndex: number, column: string, newValue: string) => {
+  const handleCellEdit = async (
+    rowIndex: number,
+    column: string,
+    newValue: string,
+  ) => {
     try {
       const response = await fetch("/api/update-row", {
         method: "POST",
@@ -42,7 +77,7 @@ export default function DataVisualization({
           rowIndex,
           column,
           value: newValue,
-          originalData: data[rowIndex]
+          originalData: data[rowIndex],
         }),
       });
 
@@ -53,7 +88,7 @@ export default function DataVisualization({
       const updatedData = [...data];
       updatedData[rowIndex][column] = newValue;
       onDataUpdate(updatedData);
-      
+
       toast.success("Cell updated successfully");
     } catch (error) {
       toast.error("Failed to update cell");
@@ -61,17 +96,25 @@ export default function DataVisualization({
     }
   };
 
-  const startEditing = (rowIndex: number, column: string, currentValue: any) => {
+  const startEditing = (
+    rowIndex: number,
+    column: string,
+    currentValue: any,
+  ) => {
     setEditingCell({
       rowIndex,
       column,
-      value: String(currentValue || "")
+      value: String(currentValue || ""),
     });
   };
 
   const saveEdit = () => {
     if (editingCell) {
-      handleCellEdit(editingCell.rowIndex, editingCell.column, editingCell.value);
+      handleCellEdit(
+        editingCell.rowIndex,
+        editingCell.column,
+        editingCell.value,
+      );
       setEditingCell(null);
     }
   };
@@ -102,19 +145,24 @@ export default function DataVisualization({
               {data.map((row, rowIndex) => (
                 <TableRow key={rowIndex}>
                   {columns.map((column) => (
-                    <TableCell 
-                      key={column} 
+                    <TableCell
+                      key={column}
                       className="group relative cursor-pointer hover:bg-muted/50"
-                      onClick={() => startEditing(rowIndex, column, row[column])}
+                      onClick={() =>
+                        startEditing(rowIndex, column, row[column])
+                      }
                     >
-                      {editingCell?.rowIndex === rowIndex && editingCell?.column === column ? (
+                      {editingCell?.rowIndex === rowIndex &&
+                      editingCell?.column === column ? (
                         <div className="flex items-center gap-2">
                           <Input
                             value={editingCell.value}
-                            onChange={(e) => setEditingCell({
-                              ...editingCell,
-                              value: e.target.value
-                            })}
+                            onChange={(e) =>
+                              setEditingCell({
+                                ...editingCell,
+                                value: e.target.value,
+                              })
+                            }
                             className="h-8"
                             autoFocus
                             onKeyDown={(e) => {
@@ -125,7 +173,11 @@ export default function DataVisualization({
                           <Button size="sm" variant="ghost" onClick={saveEdit}>
                             <Check className="h-3 w-3" />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={cancelEdit}
+                          >
                             <X className="h-3 w-3" />
                           </Button>
                         </div>
@@ -163,14 +215,17 @@ export default function DataVisualization({
                 <label className="text-xs font-medium text-muted-foreground">
                   {column}
                 </label>
-                {editingCell?.rowIndex === rowIndex && editingCell?.column === column ? (
+                {editingCell?.rowIndex === rowIndex &&
+                editingCell?.column === column ? (
                   <div className="flex items-center gap-2">
                     <Input
                       value={editingCell.value}
-                      onChange={(e) => setEditingCell({
-                        ...editingCell,
-                        value: e.target.value
-                      })}
+                      onChange={(e) =>
+                        setEditingCell({
+                          ...editingCell,
+                          value: e.target.value,
+                        })
+                      }
                       className="h-8 text-sm"
                       autoFocus
                       onKeyDown={(e) => {
@@ -186,7 +241,7 @@ export default function DataVisualization({
                     </Button>
                   </div>
                 ) : (
-                  <div 
+                  <div
                     className="group cursor-pointer p-2 rounded border hover:bg-muted/50 transition-colors"
                     onClick={() => startEditing(rowIndex, column, row[column])}
                   >
@@ -213,29 +268,37 @@ export default function DataVisualization({
 
   const renderDashboardView = () => {
     // Create sample charts from data
-    const numericColumns = columns.filter(col => 
-      data.some(row => !isNaN(Number(row[col])) && row[col] !== "")
+    const numericColumns = columns.filter((col) =>
+      data.some((row) => !isNaN(Number(row[col])) && row[col] !== ""),
     );
-    
-    const categoryColumns = columns.filter(col => 
-      !numericColumns.includes(col)
+
+    const categoryColumns = columns.filter(
+      (col) => !numericColumns.includes(col),
     );
 
     // Bar chart data
-    const barData = numericColumns.slice(0, 5).map(col => ({
+    const barData = numericColumns.slice(0, 5).map((col) => ({
       name: col,
-      value: data.reduce((sum, row) => sum + (Number(row[col]) || 0), 0) / data.length
+      value:
+        data.reduce((sum, row) => sum + (Number(row[col]) || 0), 0) /
+        data.length,
     }));
 
     // Pie chart data (first categorical column)
-    const pieData = categoryColumns[0] ? 
-      Object.entries(
-        data.reduce((acc, row) => {
-          const key = String(row[categoryColumns[0]] || "Unknown");
-          acc[key] = (acc[key] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>)
-      ).slice(0, 6).map(([name, value]) => ({ name, value })) : [];
+    const pieData = categoryColumns[0]
+      ? Object.entries(
+          data.reduce(
+            (acc, row) => {
+              const key = String(row[categoryColumns[0]] || "Unknown");
+              acc[key] = (acc[key] || 0) + 1;
+              return acc;
+            },
+            {} as Record<string, number>,
+          ),
+        )
+          .slice(0, 6)
+          .map(([name, value]) => ({ name, value }))
+      : [];
 
     return (
       <div className="space-y-6">
@@ -243,7 +306,9 @@ export default function DataVisualization({
           {/* Stats Cards */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Records</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Records
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{data.length}</div>
@@ -255,7 +320,9 @@ export default function DataVisualization({
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Numeric Fields</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Numeric Fields
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{numericColumns.length}</div>
@@ -271,9 +338,7 @@ export default function DataVisualization({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{categoryColumns.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Text-based fields
-              </p>
+              <p className="text-xs text-muted-foreground">Text-based fields</p>
             </CardContent>
           </Card>
         </div>
@@ -283,7 +348,9 @@ export default function DataVisualization({
           {barData.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Average Values</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Average Values
+                </CardTitle>
                 <CardDescription>Numeric columns overview</CardDescription>
               </CardHeader>
               <CardContent>
@@ -304,8 +371,12 @@ export default function DataVisualization({
           {pieData.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Distribution</CardTitle>
-                <CardDescription>{categoryColumns[0]} breakdown</CardDescription>
+                <CardTitle className="text-sm font-medium">
+                  Distribution
+                </CardTitle>
+                <CardDescription>
+                  {categoryColumns[0]} breakdown
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -315,13 +386,18 @@ export default function DataVisualization({
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                     >
                       {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -352,7 +428,10 @@ export default function DataVisualization({
                   {data.slice(0, 5).map((row, rowIndex) => (
                     <TableRow key={rowIndex}>
                       {columns.slice(0, 6).map((column) => (
-                        <TableCell key={column} className="max-w-[150px] truncate">
+                        <TableCell
+                          key={column}
+                          className="max-w-[150px] truncate"
+                        >
                           {String(row[column] || "")}
                         </TableCell>
                       ))}

@@ -10,7 +10,7 @@ import {
   Sun,
   Moon,
   LayoutGrid,
-  FileText
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const { theme, setTheme } = useTheme();
   const location = useLocation();
-  const isSharedPage = location.pathname.startsWith('/shared/');
+  const isSharedPage = location.pathname.startsWith("/shared/");
 
   return (
     <div className="min-h-screen bg-background">
@@ -35,7 +35,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
             <div>
               <h1 className="text-xl font-bold">DataVault</h1>
-              <p className="text-xs text-muted-foreground">Database Management Platform</p>
+              <p className="text-xs text-muted-foreground">
+                Database Management Platform
+              </p>
             </div>
           </div>
 
@@ -48,9 +50,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   size="sm"
                   className="hidden sm:flex"
                   onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = '.csv,.json,.sqlite,.db';
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = ".csv,.json,.sqlite,.db";
                     input.click();
                   }}
                 >
@@ -58,29 +60,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   Upload
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hidden sm:flex"
-                >
+                <Button variant="ghost" size="sm" className="hidden sm:flex">
                   <LayoutGrid className="h-4 w-4" />
                   Styles
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hidden sm:flex"
-                >
+                <Button variant="ghost" size="sm" className="hidden sm:flex">
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hidden sm:flex"
-                >
+                <Button variant="ghost" size="sm" className="hidden sm:flex">
                   <Share2 className="h-4 w-4" />
                   Share
                 </Button>
@@ -91,7 +81,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = "/")}
               >
                 <Database className="h-4 w-4" />
                 Create Your Own
@@ -113,9 +103,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
     </div>
   );
 }
