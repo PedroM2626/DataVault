@@ -6,7 +6,7 @@ import { handleUpload, uploadMiddleware } from "./routes/upload";
 import { handleFetchData } from "./routes/fetch-data";
 import { handleUpdateRow } from "./routes/update-row";
 import { handleExport } from "./routes/export";
-import { handleShareDesign } from "./routes/share-design";
+import { handleShareDesign, handleGetSharedDesign } from "./routes/share-design";
 
 export function createServer() {
   const app = express();
