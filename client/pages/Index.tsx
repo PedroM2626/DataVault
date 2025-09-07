@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import FileUploader from "@/components/FileUploader";
 import DataVisualization from "@/components/DataVisualization";
+import AIInsights from "@/components/AIInsights";
 import { cn } from "@/lib/utils";
 
 export type ViewMode = "table" | "cards" | "dashboard";
