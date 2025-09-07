@@ -244,12 +244,16 @@ export default function Index() {
 
       {/* Data Visualization */}
       {data.length > 0 && (
-        <DataVisualization
-          data={data}
-          columns={columns}
-          viewMode={viewMode}
-          onDataUpdate={(updatedData) => setData(updatedData)}
-        />
+        <>
+          <DataVisualization
+            data={data}
+            columns={columns}
+            viewMode={viewMode}
+            onDataUpdate={(updatedData) => setData(updatedData)}
+          />
+
+          <AIInsights />
+        </>
       )}
     </div>
   );
