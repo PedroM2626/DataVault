@@ -4,10 +4,15 @@ import { useEffect } from "react";
 const NotFound = () => {
   const inRouter = useInRouterContext();
   const location = inRouter ? useLocation() : undefined;
-  const path = location?.pathname ?? (typeof window !== "undefined" ? window.location.pathname : "/");
+  const path =
+    location?.pathname ??
+    (typeof window !== "undefined" ? window.location.pathname : "/");
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", path);
+    console.error(
+      "404 Error: User attempted to access non-existent route:",
+      path,
+    );
   }, [path]);
 
   return (

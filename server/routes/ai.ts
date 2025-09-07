@@ -2,7 +2,11 @@ import { RequestHandler } from "express";
 import { getCurrentData } from "./upload";
 
 // Simple text normalization
-const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+const normalize = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
 
 function isNumericColumn(data: any[], col: string) {
   let valid = 0;
@@ -30,7 +34,9 @@ function topN<T>(arr: T[], n: number) {
 }
 
 function guessN(question: string) {
-  const m = normalize(question).match(/\b(top|maiores|principais|top\s*)(\d{1,3})/);
+  const m = normalize(question).match(
+    /\b(top|maiores|principais|top\s*)(\d{1,3})/,
+  );
   if (m && m[2]) return Math.min(1000, parseInt(m[2], 10));
   const m2 = normalize(question).match(/\b(\d{1,3})\b/);
   if (m2) return Math.min(1000, parseInt(m2[1], 10));
@@ -42,12 +48,39 @@ function guessColumns(question: string, columns: string[]) {
   const norms = columns.map((c) => ({ raw: c, n: normalize(c) }));
 
   const synonyms: Record<string, string[]> = {
-    cliente: ["cliente", "clientes", "empresa", "empresas", "consumidor", "consumidores", "company", "customer", "client"],
+    cliente: [
+      "cliente",
+      "clientes",
+      "empresa",
+      "empresas",
+      "consumidor",
+      "consumidores",
+      "company",
+      "customer",
+      "client",
+    ],
     produto: ["produto", "produtos", "product", "item", "sku", "artigo"],
     categoria: ["categoria", "segmento", "tipo", "classe", "grupo"],
     data: ["data", "date", "dt", "dia", "mes", "m\u00eas", "ano", "year"],
-    valor: ["valor", "valor_total", "price", "preco", "pre\u00e7o", "amount", "total", "receita", "faturamento"],
-    quantidade: ["quantidade", "qtd", "volume", "count", "numero", "n\u00famero"],
+    valor: [
+      "valor",
+      "valor_total",
+      "price",
+      "preco",
+      "pre\u00e7o",
+      "amount",
+      "total",
+      "receita",
+      "faturamento",
+    ],
+    quantidade: [
+      "quantidade",
+      "qtd",
+      "volume",
+      "count",
+      "numero",
+      "n\u00famero",
+    ],
     processos: ["processo", "processos", "ordens", "orders", "tickets"],
   };
 
@@ -68,38 +101,63 @@ function guessColumns(question: string, columns: string[]) {
 
   // Try fuzzy by token overlap
   if (!result.cliente) {
-    for (const c of norms) if (/[a-z]/.test(c.n) && q.includes(c.n)) { result.cliente = c.raw; break; }
+    for (const c of norms)
+      if (/[a-z]/.test(c.n) && q.includes(c.n)) {
+        result.cliente = c.raw;
+        break;
+      }
   }
 
   return result;
 }
 
-function groupByCount(data: any[], key: string, filter?: { column: string; equals: string }) {
+function groupByCount(
+  data: any[],
+  key: string,
+  filter?: { column: string; equals: string },
+) {
   const map = new Map<string, number>();
   for (const row of data) {
     if (filter && String(row[filter.column]) !== filter.equals) continue;
     const k = String(row[key] ?? "");
     map.set(k, (map.get(k) || 0) + 1);
   }
-  const rows = Array.from(map.entries()).map(([k, v]) => ({ categoria: k, valor: v }));
+  const rows = Array.from(map.entries()).map(([k, v]) => ({
+    categoria: k,
+    valor: v,
+  }));
   rows.sort((a, b) => b.valor - a.valor);
   return rows;
 }
 
-function groupByAggregate(data: any[], key: string, valueField: string, op: "sum" | "avg") {
+function groupByAggregate(
+  data: any[],
+  key: string,
+  valueField: string,
+  op: "sum" | "avg",
+) {
   const map = new Map<string, { sum: number; count: number }>();
   for (const row of data) {
     const k = String(row[key] ?? "");
     const v = Number(row[valueField]) || 0;
     const cur = map.get(k) || { sum: 0, count: 0 };
-    cur.sum += v; cur.count += 1; map.set(k, cur);
+    cur.sum += v;
+    cur.count += 1;
+    map.set(k, cur);
   }
-  const rows = Array.from(map.entries()).map(([k, { sum, count }]) => ({ categoria: k, valor: op === "sum" ? sum : sum / (count || 1) }));
+  const rows = Array.from(map.entries()).map(([k, { sum, count }]) => ({
+    categoria: k,
+    valor: op === "sum" ? sum : sum / (count || 1),
+  }));
   rows.sort((a, b) => b.valor - a.valor);
   return rows;
 }
 
-function timeSeriesCount(data: any[], dateCol: string, unit: "month" | "year" | "day") {
+function timeSeriesCount(
+  data: any[],
+  dateCol: string,
+  unit: "month" | "year" | "day",
+) {
   const bucket = (d: Date) => {
     const y = d.getFullYear();
     if (unit === "year") return `${y}`;
@@ -116,7 +174,10 @@ function timeSeriesCount(data: any[], dateCol: string, unit: "month" | "year" | 
     const k = bucket(d);
     map.set(k, (map.get(k) || 0) + 1);
   }
-  const rows = Array.from(map.entries()).map(([k, v]) => ({ periodo: k, valor: v }));
+  const rows = Array.from(map.entries()).map(([k, v]) => ({
+    periodo: k,
+    valor: v,
+  }));
   rows.sort((a, b) => a.periodo.localeCompare(b.periodo));
   return rows;
 }
@@ -125,7 +186,9 @@ export const handleAIAnalyze: RequestHandler = async (req, res) => {
   try {
     const { data, columns } = getCurrentData();
     if (!data || data.length === 0 || !columns || columns.length === 0) {
-      return res.status(400).json({ error: "No data loaded. Upload a file first." });
+      return res
+        .status(400)
+        .json({ error: "No data loaded. Upload a file first." });
     }
 
     const question: string = req.body?.question || "";
@@ -142,11 +205,17 @@ export const handleAIAnalyze: RequestHandler = async (req, res) => {
 
     // Choose defaults
     const groupBy = guesses.cliente || guesses.categoria || catCols[0];
-    const valueField = guesses.valor && numericCols.includes(guesses.valor) ? guesses.valor : numericCols[0];
+    const valueField =
+      guesses.valor && numericCols.includes(guesses.valor)
+        ? guesses.valor
+        : numericCols[0];
 
     // Detect if question is time-related
     const qn = normalize(question);
-    const wantsTrend = /\b(tendencia|tend\u00eancia|evolucao|evolu\u00e7\u00e3o|por mes|por m\u00eas|mensal|anual|por ano|timeline|ao longo|mes a mes|m\u00eas a m\u00eas|year over year)\b/.test(qn);
+    const wantsTrend =
+      /\b(tendencia|tend\u00eancia|evolucao|evolu\u00e7\u00e3o|por mes|por m\u00eas|mensal|anual|por ano|timeline|ao longo|mes a mes|m\u00eas a m\u00eas|year over year)\b/.test(
+        qn,
+      );
 
     let tableRows: any[] = [];
     let tableColumns: string[] = [];
@@ -160,30 +229,48 @@ export const handleAIAnalyze: RequestHandler = async (req, res) => {
     // Optional filtering by product or value after "de"/"do"/"da"
     let filter: { column: string; equals: string } | undefined;
     if (qn.includes(" de ") || qn.includes(" do ") || qn.includes(" da ")) {
-      const after = qn.split(/\bde\b|\bdo\b|\bda\b/).pop()?.trim() || "";
+      const after =
+        qn
+          .split(/\bde\b|\bdo\b|\bda\b/)
+          .pop()
+          ?.trim() || "";
       const token = after.split(/\s|\?|\.|,|!|;|:|\n/).filter(Boolean)[0];
       if (token) {
         // try to find a column with many matches for this token
         for (const c of catCols) {
           const has = data.some((r) => String(r[c]).toLowerCase() === token);
-          if (has) { filter = { column: c, equals: token }; break; }
+          if (has) {
+            filter = { column: c, equals: token };
+            break;
+          }
         }
       }
     }
 
     if (wantsTrend && dateCols.length > 0) {
-      const dateCol = guesses.data && dateCols.includes(guesses.data) ? guesses.data : dateCols[0];
-      const unit: "month" | "year" = /ano|year|anual/.test(qn) ? "year" : "month";
+      const dateCol =
+        guesses.data && dateCols.includes(guesses.data)
+          ? guesses.data
+          : dateCols[0];
+      const unit: "month" | "year" = /ano|year|anual/.test(qn)
+        ? "year"
+        : "month";
       tableRows = timeSeriesCount(data, dateCol, unit);
       tableColumns = ["periodo", "valor"];
       labelKey = "periodo";
       valueKey = "valor";
       chartType = "line";
-      chartExplanation = unit === "year" ? "S\u00e9rie temporal anual de ocorr\u00eancias" : "S\u00e9rie temporal mensal de ocorr\u00eancias";
+      chartExplanation =
+        unit === "year"
+          ? "S\u00e9rie temporal anual de ocorr\u00eancias"
+          : "S\u00e9rie temporal mensal de ocorr\u00eancias";
       interpretation = `A pergunta foi interpretada como uma an\u00e1lise de tend\u00eancia ao longo do tempo usando a coluna '${dateCol}'.`;
       sql = `SELECT DATE_TRUNC('${unit}', TO_TIMESTAMP(${JSON.stringify(dateCol)})) AS periodo, COUNT(*) AS valor FROM tabela GROUP BY 1 ORDER BY 1`;
     } else {
-      const wantsSum = /\b(somar|soma|faturamento|receita|valor total|totalizado)\b/.test(qn) && !!valueField;
+      const wantsSum =
+        /\b(somar|soma|faturamento|receita|valor total|totalizado)\b/.test(
+          qn,
+        ) && !!valueField;
       const wantsAvg = /\b(media|m\u00e9dia|avg)\b/.test(qn) && !!valueField;
 
       if (wantsSum && valueField) {
@@ -205,23 +292,34 @@ export const handleAIAnalyze: RequestHandler = async (req, res) => {
       labelKey = "categoria";
       valueKey = "valor";
       chartType = "bar";
-      chartExplanation = "Gr\u00e1fico de barras permite compara\u00e7\u00e3o f\u00e1cil entre categorias.";
+      chartExplanation =
+        "Gr\u00e1fico de barras permite compara\u00e7\u00e3o f\u00e1cil entre categorias.";
     }
 
     // Narrative generation (deterministic)
     const top = tableRows[0];
     const second = tableRows[1];
-    const names = tableRows.slice(0, Math.min(3, tableRows.length)).map((r) => `${r[labelKey]} (${r[valueKey]})`).join(", ");
-    const summary = tableRows.length > 0
-      ? `Os principais resultados s\u00e3o ${names}.`
-      : "N\u00e3o h\u00e1 dados suficientes para gerar um resumo.";
+    const names = tableRows
+      .slice(0, Math.min(3, tableRows.length))
+      .map((r) => `${r[labelKey]} (${r[valueKey]})`)
+      .join(", ");
+    const summary =
+      tableRows.length > 0
+        ? `Os principais resultados s\u00e3o ${names}.`
+        : "N\u00e3o h\u00e1 dados suficientes para gerar um resumo.";
 
     const insights: string[] = [];
     if (top && second) {
       const diff = top[valueKey] - second[valueKey];
-      if (diff > 0) insights.push(`${top[labelKey]} supera ${second[labelKey]} em ${diff} ${wantsTrend ? "ocorr\u00eancias" : "unidades"}.`);
+      if (diff > 0)
+        insights.push(
+          `${top[labelKey]} supera ${second[labelKey]} em ${diff} ${wantsTrend ? "ocorr\u00eancias" : "unidades"}.`,
+        );
     }
-    if (tableRows.length >= 5) insights.push("H\u00e1 concentra\u00e7\u00e3o nos primeiros grupos, sugerindo curva de Pareto.");
+    if (tableRows.length >= 5)
+      insights.push(
+        "H\u00e1 concentra\u00e7\u00e3o nos primeiros grupos, sugerindo curva de Pareto.",
+      );
 
     const recommendations = [
       "Investigue as categorias com maior volume para oportunidades de otimiza\u00e7\u00e3o.",
@@ -256,7 +354,9 @@ export const handleAIAnalyze: RequestHandler = async (req, res) => {
         patterns: [],
         recommendations,
       },
-      provider: process.env.OPENAI_API_KEY ? "heuristic+openai-optional" : "heuristic",
+      provider: process.env.OPENAI_API_KEY
+        ? "heuristic+openai-optional"
+        : "heuristic",
     } as const;
 
     return res.json(response);
