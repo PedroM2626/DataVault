@@ -10,6 +10,7 @@ import {
   handleShareDesign,
   handleGetSharedDesign,
 } from "./routes/share-design";
+import { handleAIAnalyze } from "./routes/ai";
 
 export function createServer() {
   const app = express();
@@ -34,6 +35,9 @@ export function createServer() {
   app.post("/api/export", handleExport);
   app.post("/api/share-design", handleShareDesign);
   app.get("/api/shared/:shareId", handleGetSharedDesign);
+
+  // AI routes
+  app.post("/api/ai/analyze", handleAIAnalyze);
 
   return app;
 }
